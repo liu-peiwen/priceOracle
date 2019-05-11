@@ -13,7 +13,7 @@ contract PriceOracle is Exponential {
 
     uint public constant numBlocksPerPeriod = 240; // approximately 1 hour: 60 seconds/minute * 60 minutes/hour * 1 block/15 seconds
 
-    uint public constant maxSwingMantissa = (10 ** 17); // 0.1
+    uint public maxSwingMantissa = (10 ** 17); // 0.1
 
     /**
       * @dev Mapping of asset addresses to DSValue price oracle contracts. The price contracts
@@ -39,8 +39,7 @@ contract PriceOracle is Exponential {
     constructor(address _poster, address addr0, address reader0, address addr1, address reader1) public {
         anchorAdmin = msg.sender;
         poster = _poster;
-        maxSwing = Exp({mantissa : maxSwingMantissa});
-
+        
         // Make sure the assets are zero or different
         assert(addr0 == address(0) || (addr0 != addr1));
 
@@ -133,7 +132,7 @@ contract PriceOracle is Exponential {
       * @dev maxSwing the maximum allowed percentage difference between a new price and the anchor's price
       *      Set only in the constructor
       */
-    Exp public maxSwing;
+    Exp public maxSwing = Exp({mantissa : maxSwingMantissa});
 
     struct Anchor {
         // floor(block.number / numBlocksPerPeriod) + 1
@@ -541,5 +540,27 @@ contract PriceOracle is Exponential {
         }
 
         return result;
+    }
+
+    event NewMaxSwing(address msgSender, uint oldMaxSwingMantissa, uint newMaxSwingMantissa);
+
+    /**
+     * @dev Setter funciton for maxSwingMantissa && maxSwing
+     */
+    function setMaxSwing(uint _maxSwingMantissa) public returns (uint) {
+        // Fail when msg.sender is not poster
+        if (msg.sender != poster) {
+            return failOracle(0, OracleError.UNAUTHORIZED, OracleFailureInfo.SET_PRICE_PERMISSION_CHECK);
+        }
+        
+        uint oldMaxSwingMantissa = maxSwingMantissa;
+
+        // Update maxSwingMantissa
+        maxSwingMantissa = _maxSwingMantissa;
+
+        // Update Exp maxSwing
+        maxSwing = Exp({mantissa : maxSwingMantissa});
+
+        emit NewMaxSwing(msg.sender, oldMaxSwingMantissa, maxSwingMantissa);
     }
 }
