@@ -1,0 +1,8 @@
+{
+    "Contracts": {
+        "PriceOracle": "0x031b167aa990f82271c496e502ac2beca93f171c"
+    },
+    "Blocks": {
+        "PriceOracle": 366
+    }
+}
