@@ -17,12 +17,12 @@
     "solc": "^0.4.24",
     "solidity-coverage": "https://github.com/compound-finance/solidity-coverage.git#25fc59d2be6739d6cfe5475e33be67f7b6d57c51",
     "solium": "^1.1.7",
-    "truffle": "^4.1.11",
+    "truffle": "^4.1.4",
     "web3": "^1.0.0-beta.34"
   },
   "dependencies": {
     "ethereumjs-wallet": "^0.6.0",
-    "truffle-core": "^4.1.11",
+    "truffle-core": "^4.1.4",
     "truffle-wallet-provider": "^0.0.5"
   }
 }
