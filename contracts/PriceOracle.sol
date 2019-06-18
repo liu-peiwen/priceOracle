@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity >=0.4.25 <0.6.0;
 
 import "./Exponential.sol";
 import "./DSValue.sol";
@@ -61,7 +61,7 @@ contract PriceOracle is Exponential {
     /**
       * @notice Do not pay into PriceOracle
       */
-    function() payable public {
+    function() external payable {
         revert();
     }
 
@@ -215,7 +215,7 @@ contract PriceOracle is Exponential {
     function _setPaused(bool requestedState) public returns (uint) {
         // Check caller = anchorAdmin
         if (msg.sender != anchorAdmin) {
-            return failOracle(0, OracleError.UNAUTHORIZED, OracleFailureInfo.SET_PAUSED_OWNER_CHECK);
+            return failOracle(address(0), OracleError.UNAUTHORIZED, OracleFailureInfo.SET_PAUSED_OWNER_CHECK);
         }
 
         paused = requestedState;
@@ -235,7 +235,7 @@ contract PriceOracle is Exponential {
     function _setPendingAnchorAdmin(address newPendingAnchorAdmin) public returns (uint) {
         // Check caller = anchorAdmin
         if (msg.sender != anchorAdmin) {
-            return failOracle(0, OracleError.UNAUTHORIZED, OracleFailureInfo.SET_PENDING_ANCHOR_ADMIN_OWNER_CHECK);
+            return failOracle(address(0), OracleError.UNAUTHORIZED, OracleFailureInfo.SET_PENDING_ANCHOR_ADMIN_OWNER_CHECK);
         }
 
         // save current value, if any, for inclusion in log
@@ -257,7 +257,7 @@ contract PriceOracle is Exponential {
         // Check caller = pendingAnchorAdmin
         // msg.sender can't be zero
         if (msg.sender != pendingAnchorAdmin) {
-            return failOracle(0, OracleError.UNAUTHORIZED, OracleFailureInfo.ACCEPT_ANCHOR_ADMIN_PENDING_ANCHOR_ADMIN_CHECK);
+            return failOracle(address(0), OracleError.UNAUTHORIZED, OracleFailureInfo.ACCEPT_ANCHOR_ADMIN_PENDING_ANCHOR_ADMIN_CHECK);
         }
 
         // Save current value for inclusion in log
@@ -265,7 +265,7 @@ contract PriceOracle is Exponential {
         // Store admin = pendingAnchorAdmin
         anchorAdmin = pendingAnchorAdmin;
         // Clear the pending value
-        pendingAnchorAdmin = 0;
+        pendingAnchorAdmin = address(0);
 
         emit NewAnchorAdmin(oldAnchorAdmin, msg.sender);
 
@@ -294,7 +294,7 @@ contract PriceOracle is Exponential {
         if (paused) {
             return 0;
         } else {
-            if (readers[asset] != address(0)) {
+            if (address(readers[asset]) != address(0)) {
                 (bytes32 readValue, bool foundValue) = readers[asset].peek();
 
                 if (foundValue) {
@@ -361,7 +361,7 @@ contract PriceOracle is Exponential {
         localVars.pendingAnchorMantissa = pendingAnchors[asset];
         localVars.price = Exp({mantissa : requestedPriceMantissa});
 
-        if (readers[asset] != address(0)) {
+        if (address(readers[asset]) != address(0)) {
             return failOracle(asset, OracleError.FAILED_TO_SET_PRICE, OracleFailureInfo.SET_PRICE_IS_READER_ASSET);
         }
 
@@ -515,7 +515,7 @@ contract PriceOracle is Exponential {
       * @param requestedPriceMantissas requested new prices for the assets, scaled by 10**18. required: 0 < assets.length == requestedPriceMantissas.length
       * @return uint values in same order as inputs. For each: 0=success, otherwise a failure (see enum OracleError for details)
       */
-    function setPrices(address[] assets, uint[] requestedPriceMantissas) public returns (uint[] memory) {
+    function setPrices(address[] memory assets, uint[] memory requestedPriceMantissas) public returns (uint[] memory) {
         uint numAssets = assets.length;
         uint numPrices = requestedPriceMantissas.length;
         uint[] memory result;
@@ -523,13 +523,13 @@ contract PriceOracle is Exponential {
         // Fail when msg.sender is not poster
         if (msg.sender != poster) {
             result = new uint[](1);
-            result[0] = failOracle(0, OracleError.UNAUTHORIZED, OracleFailureInfo.SET_PRICE_PERMISSION_CHECK);
+            result[0] = failOracle(address(0), OracleError.UNAUTHORIZED, OracleFailureInfo.SET_PRICE_PERMISSION_CHECK);
             return result;
         }
 
         if ((numAssets == 0) || (numPrices != numAssets)) {
             result = new uint[](1);
-            result[0] = failOracle(0, OracleError.FAILED_TO_SET_PRICE, OracleFailureInfo.SET_PRICES_PARAM_VALIDATION);
+            result[0] = failOracle(address(0), OracleError.FAILED_TO_SET_PRICE, OracleFailureInfo.SET_PRICES_PARAM_VALIDATION);
             return result;
         }
 
@@ -550,7 +550,7 @@ contract PriceOracle is Exponential {
     function setMaxSwing(uint _maxSwingMantissa) public returns (uint) {
         // Fail when msg.sender is not poster
         if (msg.sender != poster) {
-            return failOracle(0, OracleError.UNAUTHORIZED, OracleFailureInfo.SET_PRICE_PERMISSION_CHECK);
+            return failOracle(address(0), OracleError.UNAUTHORIZED, OracleFailureInfo.SET_PRICE_PERMISSION_CHECK);
         }
         
         uint oldMaxSwingMantissa = maxSwingMantissa;

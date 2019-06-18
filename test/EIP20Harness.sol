@@ -5,7 +5,7 @@ Implements EIP20 token standard: https://github.com/ethereum/EIPs/issues/20
 // TODO: Update to newer version compatible with 0.4.24;
 
 
-pragma solidity ^0.4.24;
+pragma solidity >=0.4.25 <0.6.0;
 
 import "../contracts/EIP20Interface.sol";
 
@@ -39,9 +39,9 @@ contract EIP20Harness is EIP20Interface {
 
     constructor(
         uint256 _initialAmount,
-        string _tokenName,
+        string memory _tokenName,
         uint8 _decimalUnits,
-        string _tokenSymbol
+        string memory _tokenSymbol
     ) public {
         balances[msg.sender] = _initialAmount;               // Give the creator all initial tokens
         totalSupply = _initialAmount;                        // Update total supply

@@ -1,6 +1,6 @@
 // Abstract contract for the full DSValue standard
 // --
-pragma solidity ^0.4.24;
+pragma solidity >=0.4.25 <0.6.0;
 
 import "../contracts/DSValue.sol";
 
