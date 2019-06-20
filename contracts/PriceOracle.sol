@@ -563,4 +563,13 @@ contract PriceOracle is Exponential {
 
         emit NewMaxSwing(msg.sender, oldMaxSwingMantissa, maxSwingMantissa);
     }
+
+    /**
+     * @dev Price feeding approach.
+     * @return uint 0=success, otherwise a failure (see enum OracleError for details).
+     */
+    function priceFeeding(address asset, address assetOracle) public returns (uint) {
+        bytes32 toSetPrice = DSValue(assetOracle).read();
+        return setPrice(asset, uint(toSetPrice));
+    }
 }
