@@ -570,6 +570,6 @@ contract PriceOracle is Exponential {
      */
     function priceFeeding(address asset, address assetOracle) public returns (uint) {
         bytes32 toSetPrice = DSValue(assetOracle).read();
-        return setPrice(asset, uint(toSetPrice));
+        return setPrice(asset, uint256(toSetPrice));
     }
 }
